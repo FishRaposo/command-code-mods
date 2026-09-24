@@ -18,7 +18,10 @@ exercises deliberately**:
 - **Follow-through** — bounded, verified initiative after the judge signs off.
 - **Memory** — durable project facts, gated so they can't rot.
 - **Learning** — the agent's workflow patterns, distilled into loadable skills.
-- **Observability** — measured, not assumed: real prompt-cache hit rates.
+- **Protocols** — portable `.agents/protocols/` playbooks, activated on demand
+  the way skills fire on their descriptions.
+- **Observability** — measured, not assumed: real prompt-cache hit rates and
+  suite-wide error rates.
 
 The architectural bet: **separation of concerns between agentic components**.
 The worker (the model) never marks its own work done. The judge (self-repair)
@@ -46,6 +49,15 @@ only gains initiative after a verified completion verdict — and every
 autopilot action opens a fresh child verification cycle before anything else
 may happen. No referee judgment, no initiative.
 
+Two cross-cutting mods sit outside the linear pipeline. **error-tracker** is a
+pure observer of the harness's own error events (per-mod `mod_error`, per-tool
+`tool_errored`, `run_error`, `api_retry`, `interrupted`) with a footer badge
+and a redacted, lock-appended JSONL ledger — it registers no prompt hooks, so
+it can never affect the runs it watches. **protocol-loader** discovers
+`.agents/protocols/*.md` and activates a protocol when its "Run when …"
+trigger matches your prompt (or explicitly via `/protocol <name>`), riding the
+message tail so the system prompt stays byte-stable.
+
 ## Mods
 
 | Mod | What it does | Key capabilities |
@@ -57,6 +69,8 @@ may happen. No referee judgment, no initiative.
 | [`memory-bank`](mods/memory-bank.ts) | Durable, gated project memory | L1 events / L2 pointer registry / L3 lessons, recall injection, write-bar (only verified completions + explicit writes), auto-graduation into skills |
 | [`learn-loop`](mods/learn-loop.ts) | Autonomous skill lifecycle manager | Seeds candidates from user corrections, self-distillation turns, shadow trials with green/red stats, promotion on verified verdicts, merge review, decay/archive — receipts for every move |
 | [`cache-tracker`](mods/cache-tracker.ts) | Prompt-cache observability | Live hit-rate footer, per-run JSONL ledger, `/cache` history — registers no prompt hooks, so it can't perturb what it measures |
+| [`protocol-loader`](mods/protocol-loader.ts) | On-demand protocols, like skills | Discovers `.agents/protocols/*.md` in cwd and ancestor workspaces, trigger-matches frontmatter "Run when …" against typed prompts, `/protocol` explicit load, `/protocols` list with load state, tail injection that never touches the system prompt |
+| [`error-tracker`](mods/error-tracker.ts) | Suite-wide error observability | Pure observer of harness error events: `mod_error` per mod→hook, `tool_errored` per tool (attributed via the `tool_queued` call-id map), `run_error`, `api_retry`, `interrupted`; footer badge; redacted, retention-capped JSONL ledger; `/errors` report and `/errors-clear` |
 
 ## Design principles
 
@@ -112,7 +126,7 @@ Install the full suite:
 
 ```bash
 commandcode mods add -g FishRaposo/command-code-mods
-commandcode mods list    # verify: seven mods, zero load warnings
+commandcode mods list    # verify: nine mods, zero load warnings
 ```
 
 Install a single mod by keeping only what you want via the object form of

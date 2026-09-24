@@ -1,7 +1,7 @@
 {
   "name": "command-code-mods",
   "version": "1.1.0",
-  "description": "A composable suite of Command Code mods — a self-verifying, self-improving agent pipeline: command-center, quality-guards, self-repair, autopilot, memory-bank, learn-loop, cache-tracker.",
+  "description": "A composable suite of Command Code mods — a self-verifying, self-improving agent pipeline: command-center, quality-guards, self-repair, autopilot, memory-bank, learn-loop, cache-tracker, protocol-loader, error-tracker.",
   "keywords": [
     "command-code",
     "agent",
