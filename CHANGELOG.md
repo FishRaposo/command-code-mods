@@ -6,6 +6,16 @@ updated with every merged change.
 
 ## [Unreleased]
 
+### Docs
+
+- **README updated to the full nine-mod suite.** protocol-loader and
+  error-tracker (shipped in this cycle under "New mods") now have rows in
+  the mod table, a cross-cutting note after the pipeline diagram, and slots
+  in "Why this exists" (Protocols; Observability extended to real
+  prompt-cache hit rates and suite-wide error rates). The install
+  verification line reads "nine mods, zero load warnings"; `package.json`'s
+  description lists all nine. No behavior change.
+
 ### Tooling
 
 - **Per-folder convention** — `mods/index.md` (structural map of the nine mod sources) and `mods/AGENTS.md` (per-folder tier rules for the mod sources) now ship with the suite. `scripts/check-contracts.mjs` extends with an 8th check: any per-folder `index.md` / `AGENTS.md` in the suite must be free of operational placeholders and kit-path leaks (the same rule the templates kit's `check-templates.mjs` applies to its own per-folder files). The scan is by name, so a future per-folder file (e.g. `scripts/index.md`) is picked up automatically. `scripts/check-contracts.test.mjs` pins the helpers with four cases. The root `AGENTS.md`, the mod sources, and `lib/` are unchanged — this is additive.
